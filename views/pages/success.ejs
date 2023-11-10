@@ -1,30 +1,52 @@
-<!-- views/success.ejs -->
+<!-- views/pages/success.ejs -->
 <!doctype html>
 <html>
   <head>
-    <title>Google SignIn</title>
+    <title>Profile</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"> <!-- load bootstrap css -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- load fontawesome -->
       <style>
           body        { padding-top:70px; }
       </style>
+      <script>
+      function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut().then(function () {
+          console.log('User signed out.');
+      });
+    }
+    </script>
   </head>
   <body>
     <div class="container">
       <div class="jumbotron">
           <h1 class="text-primary  text-center"><span class="fa fa-user"></span> Profile Information</h1>
+          <a href="#" onclick="signOut();">Sign out</a>
           <div class="row">
             <div class="col-sm-6">
                 <div class="well">
                         <p>
-                            <strong>Id</strong>: <%= user.id %><br>
-                            <strong>Email</strong>: <%= user.emails[0].value %><br>
-                            <strong>Name</strong>: <%= user.displayName %>
+                            <!--<strong>Id</strong>:<%= userProfile.id %><br>-->
+                            <img src="<%= userProfile.photos[0].value %>" alt="Profile Picture">
+                            <h4>Hello,<%= userProfile.displayName %><h4><br>
+                            <h4>You are signed in with the email <%= userProfile.emails[0].value %><h4><br>
                         </p>
                 </div>
+                <div>
+                <h3>Welcome, <%= userProfile.displayName %></h3>
+                <form action="/success" method="POST">
+                    <label for="numLines">Number of Lines (maximum 100): </label>
+                    <input type="number" id="numLines" name="numLines" min="1" max="100" required>
+                    <button type="submit">Display</button>
+                  </form>
+                </div>
+                <% if (diamond) { %>
+                  <pre><%= diamond %></pre>
+                <% } %>
             </div>
         </div>
       </div>
     </div>
+    
   </body>
-</html> 
+</html>
