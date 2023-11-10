@@ -3,6 +3,7 @@
 const express = require('express');
 const app = express();
 const session = require('express-session');
+const bodyParser = require('body-parser');
 
 app.set('view engine', 'ejs');
 
@@ -19,6 +20,7 @@ app.get('/', function(req, res) {
 const port = process.env.PORT || 3000;
 app.listen(port , () => console.log('App listening on port ' + port));
 
+
 /*  PASSPORT SETUP  */
 
 const passport = require('passport');
@@ -29,7 +31,10 @@ app.use(passport.session());
 
 app.set('view engine', 'ejs');
 
-app.get('/success', (req, res) => res.send(userProfile));
+app.get('/success', (req, res) => {
+    res.render('pages/success', { userProfile: userProfile });
+});
+//app.get('/success', (req, res) => res.send(userProfile));
 app.get('/error', (req, res) => res.send("error logging in"));
 
 passport.serializeUser(function(user, cb) {
@@ -64,4 +69,39 @@ app.get('/auth/google/callback',
   function(req, res) {
     // Successful authentication, redirect success.
     res.redirect('/success');
-  });
+});
+
+//pattern
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// ... (Other server configurations)
+
+app.post('/success', (req, res) => {
+  const numLines = parseInt(req.body.numLines);
+  let diamond = '';
+  if (!isNaN(numLines) && numLines > 0 && numLines <= 100) {
+    diamond = generateDiamond(numLines);
+  } else {
+    diamond = 'Please enter a valid number of lines (1 to 100)';
+  }
+  res.render('pages/success', { userProfile: userProfile, diamond: diamond });
+});
+
+function generateDiamond(numLines) {
+  let diamond = '';
+  const half = Math.ceil(numLines / 2);
+  for (let i = 1; i <= numLines; i++) {
+    const spaces = Math.abs(half - i);
+    const stars = numLines - 2 * spaces;
+    diamond += ' '.repeat(spaces) + 'FORMULAQSOLUTIONS'.substring(0, stars) + '\n';
+  }
+  return diamond;
+}
+
+//logout
+app.get('/logout', (req, res)=>{
+  res.clearCookie('session-token');
+  res.redirect('/login')
+
+})
